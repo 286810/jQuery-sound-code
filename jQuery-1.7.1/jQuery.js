@@ -4,22 +4,170 @@
 		
 		var jQuery = function ( selector, context ) {
 			return new jQuery.fn.init( selector, context, rootjQuery );
-		};
+		},
+		
+		//Map over jQuery in case of overwrite
+		_jQuery = window.jQuery,
+		
+		//Map over $ in case of overweite
+		_$ = window.$,
+				
+		//检测参数 selector 的正则表达式
+		quickExpr = /(?:[^#<]*(<[\w\W]+>)[^>]*$|#([\w\-]*)$)/;
 		
 		jQuery.fn = jQuery.prototype = {
+			//指向构造函数 jQuery
 			constructor: jQuery,
+			/*
+			 * selector：可以是任意类型的值，但只有 undefined、DOM元素、字符串、函数、jQuery对象、普通JS对象是有效的
+			 * context：可以不传入，或传入DOM元素、jQuery对象、普通JS对象
+			 * rootjQuery：包含了 document 对象的 jQuery 对象
+			 */
 			init: function ( selector, context, rootjQuery ) {
+				var match, elem, ret, doc;
+				//如果是 undefined、null 等，直接返回 this--->空 jQuery 对象
+				if ( !selector ) {
+					return this;
+				}
+				//如果有属性 nodeType，则认为 selector 是 DOM 元素
+				if ( selector.nodeType ) {
+					this.context = this[0] = selector;
+					this.length = 1;
+					return this;
+				}
+				//如果是字符串 ‘body’
+				if ( slector === 'body' ) {
+					this.context = document;
+					this[0] = document.body;
+					this.length = 1;
+					return this;
+				}
+				//如果是其他字符串，先检测是 HTML 代码，还是 #id
+				if ( typeof selector === 'string' ) {
+					//HTML 代码
+					if ( selector.charAt(0) === '<' && selector.charAt( selector.length - 1 ) === '>' && selector.length >= 3 ) {
+						match = [ null, selector, null ];
+					} else {
+						match = quickExpr.exec( selector );
+					}
+					//是复杂 HTML 代码
+					if ( match && (match[1] || !context) ) {
+						
+						//HANDLE: $(html)->$(array)
+						if ( match[1] ) {
+							context = context instanceof jQuery ? context[0] : context;
+							doc = ( context ? context.ownerDocument || context : document );
+							
+							//单个标签
+							ret = rsingleTag.exec( selector );
+							
+							if ( ret ) {
+								if ( jQuery.isPlainObject( context ) ) {
+									selector = [ document.createElement( ret[1] ) ];
+									jQuery.fn.attr.call ( selector, context, true );
+									
+								} else {
+									selector = [ doc.createElement( ret[1] ) ];
+								}
+								
+							} else {
+								ret = jQuery.buildFragment( [ match[1] ], [ doc ] );
+								selector = ( ret.cacheable ? jQuery.clone(ret.fragment) : ret.fragment ).childNodes;
+							}
+							
+							return jQuery.merge( this, selector );
+							//HANDLE: $('#id')	 #id ，且未指定 context
+						} else {
+							elem = document.getElementById( match[2] );
+							
+							if ( elem && elem.parnetNode ) {
+								//处理IE6、7和某些版本的 Opera 当调用核心方法 getElementById() ，会按属性 name 查找而不是 id 的 bug
+								if ( elem.id !== match[2] ) {
+									return rootjQuery.find( selector );
+								}
+								
+								this.length = 1;
+								this[0] = elem;
+							}
+							
+							this.context = document;
+							this.selector = selectot;
+							return this;
+						}
+						
+					//是选择器表达式	
+					} else if ( !context || context.jquery ) {
+						return ( context || rootjQuery ).find( selector );
+					} else {
+						return this.constructor( context ).find( selector );
+					}
+					
+				//是函数
+				} else if ( jQuery.isFunction( selector ) ) {
+					return rootjQuery.ready( selector );
+				}
 				
-			}
+				//是 jQuery 对象
+				if ( selector.selector !== undefined ) {
+					this.selector = selector.selector;
+					this.context = selector.context;
+				}
+				//是任意其他值
+				return jQuery.makeArray( selector, this );
+			},
+			//选择器表达式
+			selector: '',
+			//版本号
+			jquery: '1.7.1',
+			//当前 jQuery 对象中元素的个数
+			length: 0,
+			//返回当前 jQuery 对象中元素的个数
+			size: function () {
+				return this.length;
+			},
+			//将当前 jQuery 对象转换成真正的数组
+			toArray: function () {
+				return slice.call( this, 0 );
+			},
+			//返回指定位置的元素或包含了所有元素的数组
+			get: function ( num ) {
+				return num === null ?
+					//如果没有传入参数
+					this.toArray() :
+					//传入参数值可以为负数
+					( num < 0 ? this[ this.length + num ] : this[ num ] );
+			},
+			//遍历当前 jQuery 对象，并在每个元素上执行回调函数
+			
+			//遍历当前 jQuery 对象，在每个元素上执行回调函数，并将回调函数的返回值放入一个新的 jQuery 对象中
+			
+			//创建一个新的空 jQuery 对象，然后把 DOM 元素集合放入这个对象中，并保留对当前 jQuery 对象的引用
+			
+			//结束当前链条中最近的筛选操作，并将匹配元素集合还原为之前的状态
+			
+			//将匹配元素集合缩减为集合中指定位置的元素
+			
+			//将匹配元素集合缩减为集合中第一个元素
+			
+			//将匹配元素集合缩减为集合中最后一个元素
+			
+			//将匹配元素集合缩减为集合中指定范围的子集
+			
+			//向当前 jQuery 对象的末尾添加新元素，并返回新长度
+			
+			//对当前 jQuery 对象中的元素进行排序
+			
+			//向当前 jQuery 对象中插入、删除或替换元素，如果删除了元素，则返回含有被删除元素的数组
+			
 		};
 		
 		jQuery.fn.init.prototype = jQuery.prototype;
 		
 		jQuery.extend = jQuery.fn.extend = function () {
 			//定义变量
-			//指向某个源对象；表示某个源对象的某个属性名；表示目标对象的某个属性的原始值；表示某个源对象的某个属性的值；
-			//指示变量 copy 是否是数组；表示深度复制时原始值的修正值；目标对象； 表示源对象的起始下标
-			//表示参数的个数，用于修正变量 target ；指示是否执行深度复制，默认为 false 
+			//指向某个源对象、表示某个源对象的某个属性名、表示目标对象的某个属性的原始值、表示某个源对象的某个属性的值、
+			//指示变量 copy 是否是数组、表示深度复制时原始值的修正值、目标对象、 表示源对象的起始下标、
+			//表示参数的个数，用于修正变量 target 、指示是否执行深度复制，默认为 false 
 			var options, name, src, copy, copyIsArray, clone,
 					target = arguments[0] || {},
 					i = 1,
@@ -76,14 +224,63 @@
 			return target;
 		};
 		
-		jQuery.extend();
+		jQuery.extend({
+			//释放 $ ，防止冲突
+			
+			//类型检测
+			//是否函数
+			
+			//是否数组
+			
+			//jQuery.type
+			
+			//是否 window
+			
+			//是否数字
+			
+			//是否是纯粹的对象
+			
+			//对象是否是空的
+			
+			//解析 json
+			
+			//解析 xml
+			
+			//在全局作用域中执行 js 代码
+			
+			//转换连字符为驼峰式
+			
+			//检查 DOM 元素的节点名称
+			
+			//去除字符串两边的空白符
+			
+			//数组操作方法
+			//把类数组转换成真数组
+			
+			//查找指定元素并返回其下标
+			
+			//合并两个数组
+			
+			//查找数组中满足过滤函数的元素
+			
+			//全局计算器，设置唯一标识
+			
+			//返回一个新函数，并持有特定的上下文
+			
+			//获取或设置属性值
+			
+			//辅助开发插件
+			
+			//浏览器嗅探
+			
+		});
 		jQuery.fn.extend();
 		
 		return jQuery;
 		
 	})();
 	
-	//utilities 工具方法
+	//工具方法 utilities
 	
 	//Callbacks Object 回调函数列表
 	

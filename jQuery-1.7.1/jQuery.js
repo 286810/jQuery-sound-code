@@ -1,4 +1,4 @@
-(function ( window, undefined) {
+ï»¿(function ( window, undefined) {
 	
 	var jQuery = (function () {
 		
@@ -12,7 +12,7 @@
 		//Map over $ in case of overweite
 		_$ = window.$,
 				
-		//¼ì²â²ÎÊı selector µÄÕıÔò±í´ïÊ½
+		//æ£€æµ‹å‚æ•° selector çš„æ­£åˆ™è¡¨è¾¾å¼
 		quickExpr = /(?:[^#<]*(<[\w\W]+>)[^>]*$|#([\w\-]*)$)/,
 				
 		//save a reference to some core methods
@@ -24,41 +24,41 @@
 		indexOf = Array.prototype.indexOf;		
 		
 		jQuery.fn = jQuery.prototype = {
-			//Ö¸Ïò¹¹Ôìº¯Êı jQuery
+			//æŒ‡å‘æ„é€ å‡½æ•° jQuery
 			constructor: jQuery,
 			/*
-			 * selector£º¿ÉÒÔÊÇÈÎÒâÀàĞÍµÄÖµ£¬µ«Ö»ÓĞ undefined¡¢DOMÔªËØ¡¢×Ö·û´®¡¢º¯Êı¡¢jQuery¶ÔÏó¡¢ÆÕÍ¨JS¶ÔÏóÊÇÓĞĞ§µÄ
-			 * context£º¿ÉÒÔ²»´«Èë£¬»ò´«ÈëDOMÔªËØ¡¢jQuery¶ÔÏó¡¢ÆÕÍ¨JS¶ÔÏó
-			 * rootjQuery£º°üº¬ÁË document ¶ÔÏóµÄ jQuery ¶ÔÏó
+			 * selectorï¼šå¯ä»¥æ˜¯ä»»æ„ç±»å‹çš„å€¼ï¼Œä½†åªæœ‰ undefinedã€DOMå…ƒç´ ã€å­—ç¬¦ä¸²ã€å‡½æ•°ã€jQueryå¯¹è±¡ã€æ™®é€šJSå¯¹è±¡æ˜¯æœ‰æ•ˆçš„
+			 * contextï¼šå¯ä»¥ä¸ä¼ å…¥ï¼Œæˆ–ä¼ å…¥DOMå…ƒç´ ã€jQueryå¯¹è±¡ã€æ™®é€šJSå¯¹è±¡
+			 * rootjQueryï¼šåŒ…å«äº† document å¯¹è±¡çš„ jQuery å¯¹è±¡
 			 */
 			init: function ( selector, context, rootjQuery ) {
 				var match, elem, ret, doc;
-				//Èç¹ûÊÇ undefined¡¢null µÈ£¬Ö±½Ó·µ»Ø this--->¿Õ jQuery ¶ÔÏó
+				//å¦‚æœæ˜¯ undefinedã€null ç­‰ï¼Œç›´æ¥è¿”å› this--->ç©º jQuery å¯¹è±¡
 				if ( !selector ) {
 					return this;
 				}
-				//Èç¹ûÓĞÊôĞÔ nodeType£¬ÔòÈÏÎª selector ÊÇ DOM ÔªËØ
+				//å¦‚æœæœ‰å±æ€§ nodeTypeï¼Œåˆ™è®¤ä¸º selector æ˜¯ DOM å…ƒç´ 
 				if ( selector.nodeType ) {
 					this.context = this[0] = selector;
 					this.length = 1;
 					return this;
 				}
-				//Èç¹ûÊÇ×Ö·û´® ¡®body¡¯
+				//å¦‚æœæ˜¯å­—ç¬¦ä¸² â€˜bodyâ€™
 				if ( slector === 'body' ) {
 					this.context = document;
 					this[0] = document.body;
 					this.length = 1;
 					return this;
 				}
-				//Èç¹ûÊÇÆäËû×Ö·û´®£¬ÏÈ¼ì²âÊÇ HTML ´úÂë£¬»¹ÊÇ #id
+				//å¦‚æœæ˜¯å…¶ä»–å­—ç¬¦ä¸²ï¼Œå…ˆæ£€æµ‹æ˜¯ HTML ä»£ç ï¼Œè¿˜æ˜¯ #id
 				if ( typeof selector === 'string' ) {
-					//HTML ´úÂë
+					//HTML ä»£ç 
 					if ( selector.charAt(0) === '<' && selector.charAt( selector.length - 1 ) === '>' && selector.length >= 3 ) {
 						match = [ null, selector, null ];
 					} else {
 						match = quickExpr.exec( selector );
 					}
-					//ÊÇ¸´ÔÓ HTML ´úÂë
+					//æ˜¯å¤æ‚ HTML ä»£ç 
 					if ( match && (match[1] || !context) ) {
 						
 						//HANDLE: $(html)->$(array)
@@ -66,7 +66,7 @@
 							context = context instanceof jQuery ? context[0] : context;
 							doc = ( context ? context.ownerDocument || context : document );
 							
-							//µ¥¸ö±êÇ©
+							//å•ä¸ªæ ‡ç­¾
 							ret = rsingleTag.exec( selector );
 							
 							if ( ret ) {
@@ -84,12 +84,12 @@
 							}
 							
 							return jQuery.merge( this, selector );
-							//HANDLE: $('#id')	 #id £¬ÇÒÎ´Ö¸¶¨ context
+							//HANDLE: $('#id')	 #id ï¼Œä¸”æœªæŒ‡å®š context
 						} else {
 							elem = document.getElementById( match[2] );
 							
 							if ( elem && elem.parnetNode ) {
-								//´¦ÀíIE6¡¢7ºÍÄ³Ğ©°æ±¾µÄ Opera µ±µ÷ÓÃºËĞÄ·½·¨ getElementById() £¬»á°´ÊôĞÔ name ²éÕÒ¶ø²»ÊÇ id µÄ bug
+								//å¤„ç†IE6ã€7å’ŒæŸäº›ç‰ˆæœ¬çš„ Opera å½“è°ƒç”¨æ ¸å¿ƒæ–¹æ³• getElementById() ï¼Œä¼šæŒ‰å±æ€§ name æŸ¥æ‰¾è€Œä¸æ˜¯ id çš„ bug
 								if ( elem.id !== match[2] ) {
 									return rootjQuery.find( selector );
 								}
@@ -103,49 +103,49 @@
 							return this;
 						}
 						
-					//ÊÇÑ¡ÔñÆ÷±í´ïÊ½	
+					//æ˜¯é€‰æ‹©å™¨è¡¨è¾¾å¼	
 					} else if ( !context || context.jquery ) {
 						return ( context || rootjQuery ).find( selector );
 					} else {
 						return this.constructor( context ).find( selector );
 					}
 					
-				//ÊÇº¯Êı
+				//æ˜¯å‡½æ•°
 				} else if ( jQuery.isFunction( selector ) ) {
 					return rootjQuery.ready( selector );
 				}
 				
-				//ÊÇ jQuery ¶ÔÏó
+				//æ˜¯ jQuery å¯¹è±¡
 				if ( selector.selector !== undefined ) {
 					this.selector = selector.selector;
 					this.context = selector.context;
 				}
-				//ÊÇÈÎÒâÆäËûÖµ
+				//æ˜¯ä»»æ„å…¶ä»–å€¼
 				return jQuery.makeArray( selector, this );
 			},
-			//Ñ¡ÔñÆ÷±í´ïÊ½
+			//é€‰æ‹©å™¨è¡¨è¾¾å¼
 			selector: '',
-			//°æ±¾ºÅ
+			//ç‰ˆæœ¬å·
 			jquery: '1.7.1',
-			//µ±Ç° jQuery ¶ÔÏóÖĞÔªËØµÄ¸öÊı
+			//å½“å‰ jQuery å¯¹è±¡ä¸­å…ƒç´ çš„ä¸ªæ•°
 			length: 0,
-			//·µ»Øµ±Ç° jQuery ¶ÔÏóÖĞÔªËØµÄ¸öÊı
+			//è¿”å›å½“å‰ jQuery å¯¹è±¡ä¸­å…ƒç´ çš„ä¸ªæ•°
 			size: function () {
 				return this.length;
 			},
-			//½«µ±Ç° jQuery ¶ÔÏó×ª»»³ÉÕæÕıµÄÊı×é
+			//å°†å½“å‰ jQuery å¯¹è±¡è½¬æ¢æˆçœŸæ­£çš„æ•°ç»„
 			toArray: function () {
 				return slice.call( this, 0 );
 			},
-			//·µ»ØÖ¸¶¨Î»ÖÃµÄÔªËØ»ò°üº¬ÁËËùÓĞÔªËØµÄÊı×é
+			//è¿”å›æŒ‡å®šä½ç½®çš„å…ƒç´ æˆ–åŒ…å«äº†æ‰€æœ‰å…ƒç´ çš„æ•°ç»„
 			get: function ( num ) {
 				return num === null ?
-					//Èç¹ûÃ»ÓĞ´«Èë²ÎÊı
+					//å¦‚æœæ²¡æœ‰ä¼ å…¥å‚æ•°
 					this.toArray() :
-					//´«Èë²ÎÊıÖµ¿ÉÒÔÎª¸ºÊı
+					//ä¼ å…¥å‚æ•°å€¼å¯ä»¥ä¸ºè´Ÿæ•°
 					( num < 0 ? this[ this.length + num ] : this[ num ] );
 			},
-			//ÈëÕ»£º´´½¨Ò»¸öĞÂµÄ¿Õ jQuery ¶ÔÏó£¬È»ºó°Ñ DOM ÔªËØ¼¯ºÏ·ÅÈëÕâ¸ö¶ÔÏóÖĞ£¬²¢±£Áô¶Ôµ±Ç° jQuery ¶ÔÏóµÄÒıÓÃ
+			//å…¥æ ˆï¼šåˆ›å»ºä¸€ä¸ªæ–°çš„ç©º jQuery å¯¹è±¡ï¼Œç„¶åæŠŠ DOM å…ƒç´ é›†åˆæ”¾å…¥è¿™ä¸ªå¯¹è±¡ä¸­ï¼Œå¹¶ä¿ç•™å¯¹å½“å‰ jQuery å¯¹è±¡çš„å¼•ç”¨
 			pushStack: function ( elems, name, selector ) {
 				var ret = this.constructor();
 				
@@ -155,7 +155,7 @@
 					jQuery.merge( ret, elems );
 				}
 				
-				//¹¹½¨Ò»¸öĞÂµÄ jQuery ¶ÔÏó²¢ÈëÕ»
+				//æ„å»ºä¸€ä¸ªæ–°çš„ jQuery å¯¹è±¡å¹¶å…¥æ ˆ
 				ret.prevObject = this;
 				
 				ret.context = this.context;
@@ -168,104 +168,104 @@
 				
 				return ret;
 			},
-			//±éÀúµ±Ç° jQuery ¶ÔÏó£¬²¢ÔÚÃ¿¸öÔªËØÉÏÖ´ĞĞ»Øµ÷º¯Êı
+			//éå†å½“å‰ jQuery å¯¹è±¡ï¼Œå¹¶åœ¨æ¯ä¸ªå…ƒç´ ä¸Šæ‰§è¡Œå›è°ƒå‡½æ•°
 			each: function ( callback, args ) {
 				return jQuery.each( this, callback, args );
 			},
-			//±éÀúµ±Ç° jQuery ¶ÔÏó£¬ÔÚÃ¿¸öÔªËØÉÏÖ´ĞĞ»Øµ÷º¯Êı£¬²¢½«»Øµ÷º¯ÊıµÄ·µ»ØÖµ·ÅÈëÒ»¸öĞÂµÄ jQuery ¶ÔÏóÖĞ
+			//éå†å½“å‰ jQuery å¯¹è±¡ï¼Œåœ¨æ¯ä¸ªå…ƒç´ ä¸Šæ‰§è¡Œå›è°ƒå‡½æ•°ï¼Œå¹¶å°†å›è°ƒå‡½æ•°çš„è¿”å›å€¼æ”¾å…¥ä¸€ä¸ªæ–°çš„ jQuery å¯¹è±¡ä¸­
 			map: function ( callback ) {
 				return this.pushStack( jQuery.map(this, function( elem, i ) {
 					return callback.call( elem, i, elem );
 				}));
 			},
-			//³öÕ»£º½áÊøµ±Ç°Á´ÌõÖĞ×î½üµÄÉ¸Ñ¡²Ù×÷£¬²¢½«Æ¥ÅäÔªËØ¼¯ºÏ»¹Ô­ÎªÖ®Ç°µÄ×´Ì¬
+			//å‡ºæ ˆï¼šç»“æŸå½“å‰é“¾æ¡ä¸­æœ€è¿‘çš„ç­›é€‰æ“ä½œï¼Œå¹¶å°†åŒ¹é…å…ƒç´ é›†åˆè¿˜åŸä¸ºä¹‹å‰çš„çŠ¶æ€
 			end: function () {
-				//·µ»ØÇ°Ò»¸ö jQuery ¶ÔÏó£¬Èç¹û²»´æÔÚ£¬Ôò¹¹½¨Ò»¸ö¿ÕµÄ jQuery ¶ÔÏó·µ»Ø
+				//è¿”å›å‰ä¸€ä¸ª jQuery å¯¹è±¡ï¼Œå¦‚æœä¸å­˜åœ¨ï¼Œåˆ™æ„å»ºä¸€ä¸ªç©ºçš„ jQuery å¯¹è±¡è¿”å›
 				return this.prevObject || this.constructor(null);
 			},
-			//½«Æ¥ÅäÔªËØ¼¯ºÏËõ¼õÎª¼¯ºÏÖĞÖ¸¶¨Î»ÖÃµÄÔªËØ
+			//å°†åŒ¹é…å…ƒç´ é›†åˆç¼©å‡ä¸ºé›†åˆä¸­æŒ‡å®šä½ç½®çš„å…ƒç´ 
 			eq: function( i ) {
-				//Èç¹û²ÎÊıÊÇ×Ö·û´®£¬ÓÃ + ºÅ°Ñ¸Ã²ÎÊı×ª»»³ÉÊıÖµ
+				//å¦‚æœå‚æ•°æ˜¯å­—ç¬¦ä¸²ï¼Œç”¨ + å·æŠŠè¯¥å‚æ•°è½¬æ¢æˆæ•°å€¼
 				i = +i;
 				return i === -1 ?
 					this.slice( i ) :
 					this.slice( i, i + 1 );
 			},
-			//½«Æ¥ÅäÔªËØ¼¯ºÏËõ¼õÎª¼¯ºÏÖĞµÚÒ»¸öÔªËØ
+			//å°†åŒ¹é…å…ƒç´ é›†åˆç¼©å‡ä¸ºé›†åˆä¸­ç¬¬ä¸€ä¸ªå…ƒç´ 
 			first: function() {
 				return this.eq( 0 );
 			},
-			//½«Æ¥ÅäÔªËØ¼¯ºÏËõ¼õÎª¼¯ºÏÖĞ×îºóÒ»¸öÔªËØ
+			//å°†åŒ¹é…å…ƒç´ é›†åˆç¼©å‡ä¸ºé›†åˆä¸­æœ€åä¸€ä¸ªå…ƒç´ 
 			last: function() {
 				return this.eq( -1 );
 			},
-			//½«Æ¥ÅäÔªËØ¼¯ºÏËõ¼õÎª¼¯ºÏÖĞÖ¸¶¨·¶Î§µÄ×Ó¼¯
+			//å°†åŒ¹é…å…ƒç´ é›†åˆç¼©å‡ä¸ºé›†åˆä¸­æŒ‡å®šèŒƒå›´çš„å­é›†
 			slice: function() {
 				return this.pushStack( slice.apply( this, arguments ),
 															'slice', slice.call(arguments).join(',') );
 			},
-			//Ïòµ±Ç° jQuery ¶ÔÏóµÄÄ©Î²Ìí¼ÓĞÂÔªËØ£¬²¢·µ»ØĞÂ³¤¶È
+			//å‘å½“å‰ jQuery å¯¹è±¡çš„æœ«å°¾æ·»åŠ æ–°å…ƒç´ ï¼Œå¹¶è¿”å›æ–°é•¿åº¦
 			push: push,
-			//¶Ôµ±Ç° jQuery ¶ÔÏóÖĞµÄÔªËØ½øĞĞÅÅĞò
+			//å¯¹å½“å‰ jQuery å¯¹è±¡ä¸­çš„å…ƒç´ è¿›è¡Œæ’åº
 			sort: [].sort,
-			//Ïòµ±Ç° jQuery ¶ÔÏóÖĞ²åÈë¡¢É¾³ı»òÌæ»»ÔªËØ£¬Èç¹ûÉ¾³ıÁËÔªËØ£¬Ôò·µ»Øº¬ÓĞ±»É¾³ıÔªËØµÄÊı×é
+			//å‘å½“å‰ jQuery å¯¹è±¡ä¸­æ’å…¥ã€åˆ é™¤æˆ–æ›¿æ¢å…ƒç´ ï¼Œå¦‚æœåˆ é™¤äº†å…ƒç´ ï¼Œåˆ™è¿”å›å«æœ‰è¢«åˆ é™¤å…ƒç´ çš„æ•°ç»„
 			splice: [].splice
 		};
 		
 		jQuery.fn.init.prototype = jQuery.prototype;
 		
 		jQuery.extend = jQuery.fn.extend = function () {
-			//¶¨Òå±äÁ¿
-			//Ö¸ÏòÄ³¸öÔ´¶ÔÏó¡¢±íÊ¾Ä³¸öÔ´¶ÔÏóµÄÄ³¸öÊôĞÔÃû¡¢±íÊ¾Ä¿±ê¶ÔÏóµÄÄ³¸öÊôĞÔµÄÔ­Ê¼Öµ¡¢±íÊ¾Ä³¸öÔ´¶ÔÏóµÄÄ³¸öÊôĞÔµÄÖµ¡¢
-			//Ö¸Ê¾±äÁ¿ copy ÊÇ·ñÊÇÊı×é¡¢±íÊ¾Éî¶È¸´ÖÆÊ±Ô­Ê¼ÖµµÄĞŞÕıÖµ¡¢Ä¿±ê¶ÔÏó¡¢ ±íÊ¾Ô´¶ÔÏóµÄÆğÊ¼ÏÂ±ê¡¢
-			//±íÊ¾²ÎÊıµÄ¸öÊı£¬ÓÃÓÚĞŞÕı±äÁ¿ target ¡¢Ö¸Ê¾ÊÇ·ñÖ´ĞĞÉî¶È¸´ÖÆ£¬Ä¬ÈÏÎª false 
+			//å®šä¹‰å˜é‡
+			//æŒ‡å‘æŸä¸ªæºå¯¹è±¡ã€è¡¨ç¤ºæŸä¸ªæºå¯¹è±¡çš„æŸä¸ªå±æ€§åã€è¡¨ç¤ºç›®æ ‡å¯¹è±¡çš„æŸä¸ªå±æ€§çš„åŸå§‹å€¼ã€è¡¨ç¤ºæŸä¸ªæºå¯¹è±¡çš„æŸä¸ªå±æ€§çš„å€¼ã€
+			//æŒ‡ç¤ºå˜é‡ copy æ˜¯å¦æ˜¯æ•°ç»„ã€è¡¨ç¤ºæ·±åº¦å¤åˆ¶æ—¶åŸå§‹å€¼çš„ä¿®æ­£å€¼ã€ç›®æ ‡å¯¹è±¡ã€ è¡¨ç¤ºæºå¯¹è±¡çš„èµ·å§‹ä¸‹æ ‡ã€
+			//è¡¨ç¤ºå‚æ•°çš„ä¸ªæ•°ï¼Œç”¨äºä¿®æ­£å˜é‡ target ã€æŒ‡ç¤ºæ˜¯å¦æ‰§è¡Œæ·±åº¦å¤åˆ¶ï¼Œé»˜è®¤ä¸º false 
 			var options, name, src, copy, copyIsArray, clone,
 					target = arguments[0] || {},
 					i = 1,
 					length = arguments.length,
 					deep = false;					
-			//Èç¹ûµÚÒ»¸ö²ÎÊıÊÇ²¼¶ûÖµ£¬ÔòĞŞÕıÎª deep £¬ĞŞÕıµÚ¶ş¸öÎªÄ¿±ê¶ÔÏó target£¬²¢ÆÚÍûÔ´¶ÔÏó´ÓµÚÈı¸öÔªËØ¿ªÊ¼
+			//å¦‚æœç¬¬ä¸€ä¸ªå‚æ•°æ˜¯å¸ƒå°”å€¼ï¼Œåˆ™ä¿®æ­£ä¸º deep ï¼Œä¿®æ­£ç¬¬äºŒä¸ªä¸ºç›®æ ‡å¯¹è±¡ targetï¼Œå¹¶æœŸæœ›æºå¯¹è±¡ä»ç¬¬ä¸‰ä¸ªå…ƒç´ å¼€å§‹
 			if ( typeof target === 'boolean' ) {
 				deep = arguments[0];
 				target = arguments[1] || {};
 				i = 2;
 			}
-			//Èç¹ûÊÇ×Ö·û´®
+			//å¦‚æœæ˜¯å­—ç¬¦ä¸²
 			if ( typeof target !== 'object' && !jQuery.isFunction(target)) {
 				target = {};
 			}
-			//Èç¹ûÖ»ÓĞÒ»¸ö²ÎÊı£¬Ôò°Ñ jQuery ×÷ÎªÄ¿±ê¶ÔÏó
+			//å¦‚æœåªæœ‰ä¸€ä¸ªå‚æ•°ï¼Œåˆ™æŠŠ jQuery ä½œä¸ºç›®æ ‡å¯¹è±¡
 			if ( length === i ) {
 				target = this;
 				--i;
 			}
 			
 			for ( ; i < length; i++ ) {
-				//ÏÈÅĞ¶ÏÔ´¶ÔÏóÊÇ²»ÊÇ null¡¢undefined£¬°Ñ»ñÈ¡Ô´¶ÔÏóºÍ¶ÔÔ´¶ÔÏóµÄÅĞ¶ÏºÏ²¢ÎªÒ»ÌõÓï¾ä
+				//å…ˆåˆ¤æ–­æºå¯¹è±¡æ˜¯ä¸æ˜¯ nullã€undefinedï¼ŒæŠŠè·å–æºå¯¹è±¡å’Œå¯¹æºå¯¹è±¡çš„åˆ¤æ–­åˆå¹¶ä¸ºä¸€æ¡è¯­å¥
 				if ( (optinos = arguments[i]) != null ) {
-					//±éÀúÔ´¶ÔÏóµÄÊôĞÔ
+					//éå†æºå¯¹è±¡çš„å±æ€§
 					for ( name in options ) {
-						//±äÁ¿ src ÊÇÔ­Ê¼Öµ£¬copy ÊÇ¸´ÖÆÖµ¡£Èç¹û¸´ÖÆÖµ copy ÓëÄ¿±ê¶ÔÏó target ÏàµÈ£¬ÎªÁË±ÜÃâ±éÀúÊ±ËÀÑ­»·£¬Òò´Ë²»»á¸²¸ÇÄ¿±ê¶ÔÏóµÄÍ¬ÃûÊôĞÔ
+						//å˜é‡ src æ˜¯åŸå§‹å€¼ï¼Œcopy æ˜¯å¤åˆ¶å€¼ã€‚å¦‚æœå¤åˆ¶å€¼ copy ä¸ç›®æ ‡å¯¹è±¡ target ç›¸ç­‰ï¼Œä¸ºäº†é¿å…éå†æ—¶æ­»å¾ªç¯ï¼Œå› æ­¤ä¸ä¼šè¦†ç›–ç›®æ ‡å¯¹è±¡çš„åŒåå±æ€§
 						src = target[name];
 						copy = options[name];
-						//·ÀÖ¹ËÀÑ­»·
+						//é˜²æ­¢æ­»å¾ªç¯
 						if ( target === copy ) {
 							continue;	
 						}
-						//Èç¹ûÊÇÉî¶ÈºÏ²¢£¬ÇÒ¸´ÖÆÖµ copy ÊÇÆÕÍ¨ js ¶ÔÏó»òÊı×é£¬Ôòµİ¹éºÏ²¢
+						//å¦‚æœæ˜¯æ·±åº¦åˆå¹¶ï¼Œä¸”å¤åˆ¶å€¼ copy æ˜¯æ™®é€š js å¯¹è±¡æˆ–æ•°ç»„ï¼Œåˆ™é€’å½’åˆå¹¶
 						if ( deep && copy && ( jQuery.isPlainObject(copy) || (copyIsArray = jQuery.isArray(copy)) ) ) {
 							if ( copyIsArray ) {
-								//Èç¹û copy ÊÇÊı×é£¬¶øÔ­Ê¼Öµ src ²»ÊÇ£¬ÔòĞŞÕıÎª¿ÕÊı×é£»Èç¹û copy ÊÇ¶ÔÏó£¬¶ø src ²»ÊÇ£¬ÔòĞŞÕıÎª¿Õ¶ÔÏó {}
-								//°ÑÔ­Ê¼Öµ src »òĞŞÕıºóµÄÖµ¸³Öµ¸øÔ­Ê¼Öµ¸±±¾ clone
+								//å¦‚æœ copy æ˜¯æ•°ç»„ï¼Œè€ŒåŸå§‹å€¼ src ä¸æ˜¯ï¼Œåˆ™ä¿®æ­£ä¸ºç©ºæ•°ç»„ï¼›å¦‚æœ copy æ˜¯å¯¹è±¡ï¼Œè€Œ src ä¸æ˜¯ï¼Œåˆ™ä¿®æ­£ä¸ºç©ºå¯¹è±¡ {}
+								//æŠŠåŸå§‹å€¼ src æˆ–ä¿®æ­£åçš„å€¼èµ‹å€¼ç»™åŸå§‹å€¼å‰¯æœ¬ clone
 								copyIsArray = false;
 								clone = src && jQuery.isArray(src) ? src : [];
 							} else {
 								clone = src && jQuery.isPlainObject(src) ? src : {};
 							}
-							//°Ñ¸´ÖÆÖµ copy µİ¹éºÏ²¢µ½Ô­Ê¼Öµ¸±±¾ clone ÖĞ£¬È»ºó¸²¸ÇÄ¿±ê¶ÔÏóµÄÍ¬ÃûÊôĞÔ
+							//æŠŠå¤åˆ¶å€¼ copy é€’å½’åˆå¹¶åˆ°åŸå§‹å€¼å‰¯æœ¬ clone ä¸­ï¼Œç„¶åè¦†ç›–ç›®æ ‡å¯¹è±¡çš„åŒåå±æ€§
 							target[name] = jQuery.extend( deep, clone, copy );
 						} else if ( copy !== undefined ) {
-						//Èç¹û²»ÊÇÉî¶ÈºÏ²¢£¬ÔòÖ±½Ó¸²¸ÇÄ¿±ê¶ÔÏóµÄÍ¬ÃûÊôĞÔ
+						//å¦‚æœä¸æ˜¯æ·±åº¦åˆå¹¶ï¼Œåˆ™ç›´æ¥è¦†ç›–ç›®æ ‡å¯¹è±¡çš„åŒåå±æ€§
 							target[name] = copy;
 						}
 					}
@@ -276,34 +276,34 @@
 		};
 		
 		jQuery.extend({
-			//ÊÍ·Å $ £¬·ÀÖ¹³åÍ»
+			//é‡Šæ”¾ $ ï¼Œé˜²æ­¢å†²çª
 			
-			//ÀàĞÍ¼ì²â
-			//ÊÇ·ñº¯Êı
+			//ç±»å‹æ£€æµ‹
+			//æ˜¯å¦å‡½æ•°
 			
-			//ÊÇ·ñÊı×é
+			//æ˜¯å¦æ•°ç»„
 			
 			//jQuery.type
 			
-			//ÊÇ·ñ window
+			//æ˜¯å¦ window
 			
-			//ÊÇ·ñÊı×Ö
+			//æ˜¯å¦æ•°å­—
 			
-			//ÊÇ·ñÊÇ´¿´âµÄ¶ÔÏó
+			//æ˜¯å¦æ˜¯çº¯ç²¹çš„å¯¹è±¡
 			
-			//¶ÔÏóÊÇ·ñÊÇ¿ÕµÄ
+			//å¯¹è±¡æ˜¯å¦æ˜¯ç©ºçš„
 			
-			//½âÎö json
+			//è§£æ json
 			
-			//½âÎö xml
+			//è§£æ xml
 			
-			//ÔÚÈ«¾Ö×÷ÓÃÓòÖĞÖ´ĞĞ js ´úÂë
+			//åœ¨å…¨å±€ä½œç”¨åŸŸä¸­æ‰§è¡Œ js ä»£ç 
 			
-			//×ª»»Á¬×Ö·ûÎªÍÕ·åÊ½
+			//è½¬æ¢è¿å­—ç¬¦ä¸ºé©¼å³°å¼
 			
-			//¼ì²é DOM ÔªËØµÄ½ÚµãÃû³Æ
+			//æ£€æŸ¥ DOM å…ƒç´ çš„èŠ‚ç‚¹åç§°
 			
-			//±éÀúµ±Ç° jQuery ¶ÔÏó£¬²¢ÔÚÃ¿¸öÔªËØÉÏÖ´ĞĞ»Øµ÷º¯Êı
+			//éå†å½“å‰ jQuery å¯¹è±¡ï¼Œå¹¶åœ¨æ¯ä¸ªå…ƒç´ ä¸Šæ‰§è¡Œå›è°ƒå‡½æ•°
 			each: function ( object, callback, args ) {
 				var name, i = 0,
 						length = object.length,
@@ -341,19 +341,19 @@
 				
 				return object;
 			},
-			//È¥³ı×Ö·û´®Á½±ßµÄ¿Õ°×·û
+			//å»é™¤å­—ç¬¦ä¸²ä¸¤è¾¹çš„ç©ºç™½ç¬¦
 			
-			//Êı×é²Ù×÷·½·¨
-			//°ÑÀàÊı×é×ª»»³ÉÕæÊı×é
+			//æ•°ç»„æ“ä½œæ–¹æ³•
+			//æŠŠç±»æ•°ç»„è½¬æ¢æˆçœŸæ•°ç»„
 			
-			//²éÕÒÖ¸¶¨ÔªËØ²¢·µ»ØÆäÏÂ±ê
+			//æŸ¥æ‰¾æŒ‡å®šå…ƒç´ å¹¶è¿”å›å…¶ä¸‹æ ‡
 			
-			//ºÏ²¢Á½¸öÊı×é
+			//åˆå¹¶ä¸¤ä¸ªæ•°ç»„
 			
-			//²éÕÒÊı×éÖĞÂú×ã¹ıÂËº¯ÊıµÄÔªËØ
+			//æŸ¥æ‰¾æ•°ç»„ä¸­æ»¡è¶³è¿‡æ»¤å‡½æ•°çš„å…ƒç´ 
 			
-			//±éÀúµ±Ç° jQuery ¶ÔÏó£¬ÔÚÃ¿¸öÔªËØÉÏÖ´ĞĞ»Øµ÷º¯Êı£¬²¢½«»Øµ÷º¯ÊıµÄ·µ»ØÖµ·ÅÈëÒ»¸öĞÂµÄ jQuery ¶ÔÏóÖĞ
-			//²ÎÊı£º´ı±éÀúµÄÊı×é»ò¶ÔÏó¡¢»Øµ÷º¯Êı¡¢½öÏŞÓÚ jQuery ÄÚ²¿Ê¹ÓÃ
+			//éå†å½“å‰ jQuery å¯¹è±¡ï¼Œåœ¨æ¯ä¸ªå…ƒç´ ä¸Šæ‰§è¡Œå›è°ƒå‡½æ•°ï¼Œå¹¶å°†å›è°ƒå‡½æ•°çš„è¿”å›å€¼æ”¾å…¥ä¸€ä¸ªæ–°çš„ jQuery å¯¹è±¡ä¸­
+			//å‚æ•°ï¼šå¾…éå†çš„æ•°ç»„æˆ–å¯¹è±¡ã€å›è°ƒå‡½æ•°ã€ä»…é™äº jQuery å†…éƒ¨ä½¿ç”¨
 			map: function( elems, callback, arg ) {
 				var value, key, ret = [],
 						i = 0,
@@ -365,7 +365,7 @@
 					for ( ; i < length; i++) {
 						value = callback( elems[ i ], i, arg );
 						
-						//Èç¹û»Øµ÷º¯ÊıµÄ·µ»ØÖµ²»ÊÇ null »ò undefined£¬Ôò°Ñ·µ»ØÖµ·ÅÈë½á¹û¼¯ ret
+						//å¦‚æœå›è°ƒå‡½æ•°çš„è¿”å›å€¼ä¸æ˜¯ null æˆ– undefinedï¼Œåˆ™æŠŠè¿”å›å€¼æ”¾å…¥ç»“æœé›† ret
 						if ( value != null ) {
 							ret[ ret.length ] = value;	
 						}
@@ -380,18 +380,18 @@
 					}
 				}
 				
-				//±âÆ½»¯½á¹û¼¯ ret
+				//æ‰å¹³åŒ–ç»“æœé›† ret
 				return ret.concat.apply( [], ret );
 			}
-			//È«¾Ö¼ÆËãÆ÷£¬ÉèÖÃÎ¨Ò»±êÊ¶
+			//å…¨å±€è®¡ç®—å™¨ï¼Œè®¾ç½®å”¯ä¸€æ ‡è¯†
 			
-			//·µ»ØÒ»¸öĞÂº¯Êı£¬²¢³ÖÓĞÌØ¶¨µÄÉÏÏÂÎÄ
+			//è¿”å›ä¸€ä¸ªæ–°å‡½æ•°ï¼Œå¹¶æŒæœ‰ç‰¹å®šçš„ä¸Šä¸‹æ–‡
 			
-			//»ñÈ¡»òÉèÖÃÊôĞÔÖµ
+			//è·å–æˆ–è®¾ç½®å±æ€§å€¼
 			
-			//¸¨Öú¿ª·¢²å¼ş
+			//è¾…åŠ©å¼€å‘æ’ä»¶
 			
-			//ä¯ÀÀÆ÷ĞáÌ½
+			//æµè§ˆå™¨å—…æ¢
 			
 		});
 		
@@ -399,35 +399,35 @@
 		
 	})();
 	
-	//¹¤¾ß·½·¨ utilities
+	//å·¥å…·æ–¹æ³• utilities
 	
-	//Callbacks Object »Øµ÷º¯ÊıÁĞ±í
+	//Callbacks Object å›è°ƒå‡½æ•°åˆ—è¡¨
 	
-	//Deferred Object Òì²½¶ÓÁĞ
+	//Deferred Object å¼‚æ­¥é˜Ÿåˆ—
 	
-	//Support ä¯ÀÀÆ÷¹¦ÄÜ²âÊÔ
+	//Support æµè§ˆå™¨åŠŸèƒ½æµ‹è¯•
 	
-	//Data Êı¾İ»º´æ
+	//Data æ•°æ®ç¼“å­˜
 	
-	//Queue ¶ÓÁĞ
+	//Queue é˜Ÿåˆ—
 	
-	//Attributes ÊôĞÔ²Ù×÷
+	//Attributes å±æ€§æ“ä½œ
 	
-	//Events ÊÂ¼şÏµÍ³
+	//Events äº‹ä»¶ç³»ç»Ÿ
 	
-	//Sizzle Ñ¡ÔñÆ÷
+	//Sizzle é€‰æ‹©å™¨
 	
-	//Traversing Dom±éÀú
+	//Traversing Doméå†
 	
-	//Manipulation DOM²Ù×÷
+	//Manipulation DOMæ“ä½œ
 	
-	//Css ÑùÊ½²Ù×÷
+	//Css æ ·å¼æ“ä½œ
 	
-	//Ajax Òì²½ÇëÇó
+	//Ajax å¼‚æ­¥è¯·æ±‚
 	
-	//Effects ¶¯»­
+	//Effects åŠ¨ç”»
 	
-	//Offset and Dimensions ×ø±ê¡¢³ß´ç
+	//Offset and Dimensions åæ ‡ã€å°ºå¯¸
 	
 	window.jQuery = window.$ = jQuery;
 })(window);

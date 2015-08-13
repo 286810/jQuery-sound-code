@@ -15,13 +15,45 @@
 		//检测参数 selector 的正则表达式
 		quickExpr = /(?:[^#<]*(<[\w\W]+>)[^>]*$|#([\w\-]*)$)/,
 				
-		//save a reference to some core methods
+		//检查字符串是否有非空字符
+		rnotwhite = /\S/,
+				
+		//匹配空白字符：空格、制表符、换行符、换页符
+		trimLeft = /^\s+/,
+		trimRight = /\s+$/,
+				
+		//匹配单标签
+		singleTag = /^<(\w+)\s*\/?>(?:<\/\1>?$/,
+		
+		//JSON RegExp
+		//检查字符串是否只含有指定的字符 ( ']'、','、':'、'{'、'}'、'\s' )
+		rvalidchars = /^[\],:{}\s]*$/,
+		//匹配转义字符
+		rvalidescape = /\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g,
+		//匹配有效值
+		rvalidtokens = /"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g,
+		//匹配正确的左方括号
+		rvalidbraces = /(?:^|:|,)(?:\s*\[)+/g,
+				
+		//匹配连字符 ‘-’ 和其后的第一个字母或数字，如果是字母，则替换为大写，如果是数字，则保留数字
+		rdashAlpha = /-([a-z]|[0-9])/ig,
+		//匹配 IE 中的 ‘-ms-’，替换为 ‘ms-’，这是因为 IE 中，‘-ms-’ 对应小写的 ‘ms’，而不是驼峰式的 ’Ms‘
+		rmsPrefix = /^-ms-/,
+		//注意函数中的参数 letter 对应的是 '([a-z]|[0-9])' 匹配的字母或数字
+		fcamelCase = function( all, letter ) {
+			return ( letter + '' ).toUpperCase();		
+		},		
+				
+		//抽取内部对象的核心方法，供以后使用
 		toString = Object.prototype.toString,
 		hasOwn = Object.prototype.hasOwnProperty,
 		push = Array.prototype.push,
 		slice = Array.prototype.slice,
 		trim = String.prototype.trim,
-		indexOf = Array.prototype.indexOf;		
+		indexOf = Array.prototype.indexOf,
+				
+		//存放内部对象类
+		class2type = {};		
 		
 		jQuery.fn = jQuery.prototype = {
 			//指向构造函数 jQuery
@@ -277,32 +309,126 @@
 		
 		jQuery.extend({
 			//释放 $ ，防止冲突
-			
+			noConflict: function( deep ) {
+				if ( window.$ === jQuery ) {
+					window.$ = _$;
+				}
+				
+				if ( deep && window.jQuery === jQuery ) {
+					window.jQuery = _jQuery;
+				}
+				
+				return jQuery;
+			},
 			//类型检测
 			//是否函数
-			
+			isFunction: function( obj ) {
+				return jQuery.type(obj) === 'function';
+			},
 			//是否数组
-			
+			isArray: Array.isArray || function( obj ) {
+				return jQuery.type(obj) === 'array';
+			},
 			//jQuery.type
-			
+			type: function( obj ) {
+				return obj === null ?
+					String( obj ) :
+					//从 class2type 中取出内部对象类名
+					class2type[ toString.call(obj) ] || 'object';
+			},
 			//是否 window
-			
-			//是否数字
-			
+			isWindow: function( obj ) {
+				return obj != null && obj == obj.window;
+			},
+			//是否数字：合法并且是有限的
+			isNumeric: function( obj ) {
+				return !isNaN( parseFloat(obj) ) && isFinite( obj );
+			},
 			//是否是纯粹的对象
-			
+			isPlainObject: function( obj ) {
+				if ( !obj || jQuery.type(obj) !== 'object' || obj.nodeType || jQuery.isWindow(obj) ) {
+					return false;
+				}
+				//如果由自定义函数创建,返回 false
+				try {
+					if ( obj.constructor && !hasOwn.call(obj, 'constructor') &&
+							!hasOwn.call(obj.constructor.prototype, 'isPrototypeOf') ) {
+						return false;
+					}
+				} catch ( e ) {
+					//IE8,9 会抛出错误
+					return false;
+				}
+				//如果含有继承属性，则返回 false
+				var key;
+				for ( key in obj ) {}
+				
+				return key === undefined || hasOwn.call( obj, key );
+			},
 			//对象是否是空的
-			
+			isEmptyObject: function( obj ) {
+				for ( var name in obj ) {
+					return false;
+				}
+				return true;
+			},
 			//解析 json
-			
+			parseJSON: function( data ) {
+				if ( typeof data !== 'string' || !data ) {
+					return null;
+				}
+				
+				//移除开头末尾空白符，否则 IE6、7 不能正确解析
+				data = jQuery.trim( data );
+				
+				if ( window.JSON && window.JSON.parse ) {
+					return window.JSON.parse( data );
+				}
+				
+				//确保 JSON 字符串是合法的，参考 http://json.org/json2.js
+				if ( rvalidchars.test( data.replace( rvalidescape, '@').replace( rvalidtokens, ']').replace( rvalidbraces, '' ) ) ) {
+					//开始解析
+					return ( new Function( 'return ' + data ) ) ();
+				}
+				
+				jQuery.error( 'Invalid JSON: ' + data );
+			},
 			//解析 xml
-			
+			parseXML: function( data ) {
+				var xml,tmp;
+				try {
+					if ( window.DOMParser ) {
+						tmp = new DOMParser();
+						xml = tmp.parseFromString( data, 'text/xml' );
+					} eles { //IE
+						xml = new ActiveXObject( 'microsf.XMLDOM' );
+						xml.async = 'false';
+						xml.loadXML( data );
+					}
+				} catch( e ) {
+					xml = undefined;
+				}
+				if ( !xml || !xml.documentElement || xml.getElementsByTagName( 'parsererror' ).length ) {
+					jQuery.error( 'Invalid XML: ' + data );
+				}
+				return xml;
+			},
 			//在全局作用域中执行 js 代码
-			
+			gloabalEval: function( data ) {
+				if ( data && rnotwhite.test( data ) ) {
+					( window.execScript || function( data ) {
+						window[ 'eval' ].call( window, data );
+					} )( data );
+				}
+			},
 			//转换连字符为驼峰式
-			
+			camelCase: function( string ) {
+				return string.replace( rmsprefix, 'ms-' ).replace( rdashAlpha, fcamelCase );
+			},
 			//检查 DOM 元素的节点名称
-			
+			nodeName: function( elem, name ) {
+				return elem.nodeName && elem.nodeName.toUpperCase() === name.toUpperCase();
+			},
 			//遍历当前 jQuery 对象，并在每个元素上执行回调函数
 			each: function ( object, callback, args ) {
 				var name, i = 0,
@@ -342,18 +468,114 @@
 				return object;
 			},
 			//去除字符串两边的空白符
-			
+			trim: trim ? 
+				function( text ) {
+					return text == null ?
+						'' :
+						trim.call( text );
+				} :
+				function( text ) {
+					return text == null ? 
+						'' :
+						text.toString().replace( trimLeft, '' ).replace( trimRight, '' );
+				}
+			},
 			//数组操作方法
 			//把类数组转换成真数组
-			
-			//查找指定元素并返回其下标
-			
-			//合并两个数组
-			
-			//查找数组中满足过滤函数的元素
-			
+			makeArray: function( array, results ) {
+				var ret = results || [];
+		
+				if ( array != null ) {
+					// The window, strings (and functions) also have 'length'
+					// Tweaked logic slightly to handle Blackberry 4.7 RegExp issues #6930
+					var type = jQuery.type( array );
+		
+					if ( array.length == null || 
+							 type === "string" || 
+							 type === "function" || 
+							 type === "regexp" || 
+							 jQuery.isWindow( array ) ) {
+						push.call( ret, array );
+					} else {
+						jQuery.merge( ret, array );
+					}
+				}
+		
+				return ret;
+			},
+			/*
+			 * 查找指定元素并返回其下标
+			 * 由于返回的是数字，可用按位非运算符（~）将运算数的所有位取反，相当于改变它的符号并减 1
+			 * ~-1 == 0;
+			 * ~0 == -1;
+			 * ~1 == -2;
+			 * 或者用 '!!' 转换成布尔值：
+			 * if ( !!~jQuery.inArray( elem, array, i ) ) {  }
+			 */
+			inArray: function( elem, array, i ) {
+				var len;
+				
+				if ( array ) {
+					if ( indexOf ) {
+						return indexOf.call( array, elem, i );
+					}
+					
+					len = array.length;
+					i = i ? i < 0 ? Math.max( 0 , len + i ) : i : 0;
+					
+					for ( ; i < len; i++ ) {
+						if ( i in array && array[ i ] === elem ) {
+							return i;	
+						}
+					}
+				}
+			},
+			/*
+			 * 将第二个数组合并到第一个数组中,注意合并后第一个数组已经被改变了，如果不想被改变，可以创建一份它的副本：
+			 * var newArray = $.merge( [], oldArray);
+			 * 参数：
+			 * first：数组或类数组对象，必须含有整型属性 length
+			 * second：数组、类数组对象或含有连续整型属性的对象
+			 *
+			 * 注：还可以用 jQuery.makeArray() 将参数变成真正的数组
+			 */
+			merge: function( first, second ) {
+				var i = first.length,
+						j = 0;
+				
+				if ( typeof second.length === 'number' ) {
+					for ( var l = second.length; j < l; j++ ) {
+						first[ i++ ] = second[ j ];
+					}
+				} else {
+					while ( second[ j ] !== undefined ) {
+						first[ i++ ] = second[ j++ ];
+					}
+				}
+			},
+			/*
+			 * 查找数组中满足过滤函数的元素
+			 * elems：待遍历查找的数组
+			 * callback：过滤函数，执行时传入两个参数：当前元素和下标，返回一个布尔值
+			 * inv：如果是 false 或未传入，则 jQuery.grep() 会返回一个满足回调函数的数组；如果是 true ，则返回一个不满足回调函数的数组
+			 * 
+			 * 注：( inv !== retVal ) 表达式实现了这个巧妙的用法
+			 */
+			grep: function( elems, callback, inv ) {
+				var ret = [], retVal;
+				inv = !!inv;
+				
+				for ( var i = 0, length = elems.length; i < length; i++ ) {
+					retVal = !!callback( elems[ i ], i );
+					if ( inv !== retVal ) {
+						ret.push( elems[ i ] );
+					}
+				}
+				
+				return ret;
+			}
 			//遍历当前 jQuery 对象，在每个元素上执行回调函数，并将回调函数的返回值放入一个新的 jQuery 对象中
-			//参数：待遍历的数组或对象、回调函数、仅限于 jQuery 内部使用
+			//参数：待遍历的数组或对象、回调函数、arg 仅限于 jQuery 内部使用
 			map: function( elems, callback, arg ) {
 				var value, key, ret = [],
 						i = 0,
@@ -382,9 +604,9 @@
 				
 				//扁平化结果集 ret
 				return ret.concat.apply( [], ret );
-			}
-			//全局计算器，设置唯一标识
-			
+			},
+			//全局计算器，设置唯一标识，用于 jQuery 事件模块和缓存模块
+			guiid: 1,
 			//返回一个新函数，并持有特定的上下文
 			
 			//获取或设置属性值
@@ -394,6 +616,16 @@
 			//浏览器嗅探
 			
 		});
+		
+		//设置对象内部类对应的类型
+		jQuery.each('Boolean Number String Function Array Date RegExp Object'.split(' '), function(i,name) {
+			class2type[ '[object ' + name + ']' ] = name.toLowerCase();
+		});
+		//IE9以下 \s 不匹配不间断空格 \xA0 ，需要为正则 trimLeft 和 trimRight 加上 '\xA0'
+		if ( rnotwhite.test( '\xA0' ) {
+			trimLeft = /^[\s\xA0]+/;
+			trimRight = /[\s\xA0]+/;
+		}
 		
 		return jQuery;
 		

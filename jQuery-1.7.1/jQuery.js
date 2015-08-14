@@ -35,6 +35,12 @@
 		//匹配正确的左方括号
 		rvalidbraces = /(?:^|:|,)(?:\s*\[)+/g,
 				
+		//Useragent RegExp
+		rwebkit = /(webkit)[ \/]([\w.]+)/,
+		ropera = /(opera)(?:.*version)?[ \/]([\w.]+)/,
+		rmsie = /(msie) ([\w.]+)/,
+		rmozilla = /(mozilla)(?:.*? rv:([\w.]+)?/,
+				
 		//匹配连字符 ‘-’ 和其后的第一个字母或数字，如果是字母，则替换为大写，如果是数字，则保留数字
 		rdashAlpha = /-([a-z]|[0-9])/ig,
 		//匹配 IE 中的 ‘-ms-’，替换为 ‘ms-’，这是因为 IE 中，‘-ms-’ 对应小写的 ‘ms’，而不是驼峰式的 ’Ms‘
@@ -43,6 +49,9 @@
 		fcamelCase = function( all, letter ) {
 			return ( letter + '' ).toUpperCase();		
 		},		
+		
+		//UserAgent string
+		userAgent = navigator.userAgent,
 				
 		//抽取内部对象的核心方法，供以后使用
 		toString = Object.prototype.toString,
@@ -478,8 +487,7 @@
 					return text == null ? 
 						'' :
 						text.toString().replace( trimLeft, '' ).replace( trimRight, '' );
-				}
-			},
+				},
 			//数组操作方法
 			//把类数组转换成真数组
 			makeArray: function( array, results ) {
@@ -573,7 +581,7 @@
 				}
 				
 				return ret;
-			}
+			},
 			//遍历当前 jQuery 对象，在每个元素上执行回调函数，并将回调函数的返回值放入一个新的 jQuery 对象中
 			//参数：待遍历的数组或对象、回调函数、arg 仅限于 jQuery 内部使用
 			map: function( elems, callback, arg ) {
@@ -608,19 +616,98 @@
 			//全局计算器，设置唯一标识，用于 jQuery 事件模块和缓存模块
 			guiid: 1,
 			//返回一个新函数，并持有特定的上下文
-			
-			//获取或设置属性值
+			proxy: function( fn, context ) {
+				if ( typeof context === 'string' ) {
+					var tmp = fn[ context ];
+					context = fn;
+					fn = tmp;
+				}
+				
+				if ( !jQuery.isFunction( fn ) ) {
+					return undefined;
+				}
+				
+				var args = slice.call( arguments, 2 ),
+						// 创建一个代理函数，在代理函数中调用原始函数 fn。代理函数通过闭包机制引用 context、args、slice
+						proxy = function() {
+							ruturn fn.apply( context, args.concat( slice.call( arguments ) ) );
+						};
+				
+				//给代理函数和原始函数设置相同的唯一标识
+				proxy.guid = fn.guid = fn.guid || proxy.guid || jQuery.guid++;
+			},
+			/*
+			 * 获取或设置属性值
+			 * elems：元素集合，通常是 jQuery 对象
+			 * key：属性名或含有键值对的对象
+			 * value：属性值或函数。当 key 是对象时，该参数为 undefined
+			 * exec：布尔值，当 value 为函数时，指示是否执行函数
+			 * fn：回调函数
+			 * pass：布尔值，可以忽略
+			 */
+			access: function( elems, key, value, exec, fn, pass ) {
+				var length = elems.length;
+				
+				if ( typeof key === 'Object' ) {
+					for ( var k in key ) {
+						jQuery.access( elems, k, key[k], exec, fn, value);
+					}
+					return elems;
+				}
+				
+				if ( value !== undefined ) {
+					exec = !pass && exec && jQuery.isFunction(value);
+					
+					for ( var i = 0; i < length; i++ ) {
+						fn( elems[i], key, exec ? value.call( elems[i], i, fn( elems[i], key )) : value, pass );
+					}
+					
+					return elems;
+				}
+				
+				return length ? fn( elems[0], key ) : undefined;
+			},
 			
 			//辅助开发插件
-			
+			error: function( msg ) {
+					throw new Error( msg );
+			},
+			noop: function() {},
+			now: function() {
+				return ( new Date() ).getTime();	
+			},
 			//浏览器嗅探
-			
+			uaMatch: function( ua ) {
+				ua = ua.toLowerCase();
+				
+				var match = rwebkit.exec( ua ) ||
+						ropera.exec( ua ) ||
+						rmsie.exec( ua ) ||
+						ua.indexOf('compatible') < 0 && rmozilla.exec( ua ) ||
+						[];
+				
+				return { browser: match[1] || '', version: match[2] || '0' };
+			},
+				
+			browser: {}
 		});
 		
 		//设置对象内部类对应的类型
 		jQuery.each('Boolean Number String Function Array Date RegExp Object'.split(' '), function(i,name) {
 			class2type[ '[object ' + name + ']' ] = name.toLowerCase();
 		});
+			
+		browserMatch = jQuery.uaMatch( userAgent );
+		if ( browserMatch.browser ) {
+			jQuery.browser[ browserMatch.browser ] = true;
+			jQuery.browser.version = browserMatch.version;
+		}
+		
+		// Deprecated, use jQuery.browser.webkit instead
+		if ( jQuery.browser.webkit ) {
+			jQuery.browser.safari = true;
+		}
+
 		//IE9以下 \s 不匹配不间断空格 \xA0 ，需要为正则 trimLeft 和 trimRight 加上 '\xA0'
 		if ( rnotwhite.test( '\xA0' ) {
 			trimLeft = /^[\s\xA0]+/;

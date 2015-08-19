@@ -718,10 +718,113 @@
 		
 	})();
 	
-	//utilities 工具方法
+	//工具方法 utilities
 	
 	//Callbacks Object 回调函数列表
-	
+		//存储转换后的标记对象
+		var flagsCache = {};
+		//字符串格式标记转换为对象格式标记并存储在缓存中
+		// flags 参数是结构为一个用空格标记分隔的标志可选列表,用来改变回调列表中的行为 (比如 'unique stopOnFalse' )
+		function createFlags( flags ) {
+			var object = flagsCache[ flags ] = {},
+					i, length;
+			flags = flags.split( /\s+/ );
+			for ( i = 0, length = flags.length; i < length; i++ ) {
+				object[ flags[i] ] = true;
+			}
+			return object;
+		}
+		/*
+		 * flags 参数是结构为一个用空格标记分隔的标志可选列表,用来改变回调列表中的行为 (比如 'unique stopOnFalse' )
+		 * 
+		 * once: 确保这个回调列表只执行（ .fire() ）一次(像一个递延 Deferred).
+		 * 
+		 * memory: 保持以前的值，将添加到这个列表的后面的最新的值立即执行调用任何回调 (像一个递延 Deferred).
+		 *
+		 * unique: 确保一次只能添加一个回调(所以在列表中没有重复的回调).
+		 *
+		 * stopOnFalse: 当一个回调返回false 时中断调用
+		 */
+		jQuery.Callbacks = function( flags ) {
+			//先从缓存对象中获取标记字符串 flags 对应的标记对象，如果没找到，用工具函数将标记字符串解析为标记对象
+			flags = flags ? ( flagsCache[ flags ] || createFlags[ flags ] ) : {};
+			
+			var // Actual callback list
+					list = [],
+					// Stack of fire calls for repeatable lists
+					stack = [],
+					// Last fire value for non-forgettable lists
+					memory,
+					// Flag to know if list was already fired
+					fired,
+					// Flag to know if list is currently firing
+					firing,
+					// First callback to fire
+					firingStart,
+					// End of the loop when firing
+					firingLength,
+					//Index of currently firing callback
+					firingIndex,
+					
+					add = function( args ) {
+						var i,
+								length,
+								elem,
+								type,
+								actual;
+						for ( i = 0, length = args.length; i < length; i++ ) {
+							elem = args[ i ];
+							type = jQuery.type( elem );
+							if ( type === 'array' ) {
+								//迭代调用工具函数 add( args ) 把数组中的回调函数添加到数组 list 中
+								add( elem );
+							} eles if ( type === 'function' ) {
+								//如果 args[i] 是函数并且不是 unique 模式，或者是unique 模式但未添加过
+								if ( !flags.unique || !self.has( elem ) ) {
+									list.push( elem );
+								}
+							}
+						}
+					},
+					/*
+					 * context：回调函数执行时的上下文，即 this 所引用的对象
+					 *
+					 * args：调用回调函数时传入的参数
+					 */
+					fire = function( context, args ) {
+						args = args || [];
+						//如果当前回调函数列表不是 memory 模式，则 memory 被赋值为 true；如果是 memory 模式，则被赋值为 [ context, args ]，均表示回调函数列表已经被触发过
+						memory = !flags.memory || [ context, args ];
+						//执行前设置为 true，表示正在执行
+						firing = true;
+						firingIndex = firingStart || 0;
+						firingStart = 0;
+						firingLength = list.length;
+						for ( ; list && firingIndex < firingLength; firingIndex++ ) {
+							//执行回调函数 list[ firingIndex ],如果返回值是 false，并且是 stopOnFalse 模式，则变量 memory 被赋值为 true，并停止执行后续的回调函数，表示当前回调函数列表已经被触发过
+							if ( list[ firingIndex ].apply( context, args ) === false && flags.stopOnFalse ) {
+								memory = true;
+								break;
+							}
+						}
+						//执行后设置为 false，表示未执行
+						firing = false;
+						if ( list ) {
+							//如果不是 once 模式，则从 stack 中弹出存放的下文和参数，再次执行整个回调函数列表，直到 stack 为空
+							if ( !flags.once ) {
+								if ( stack && stack.length ) {
+									memory = stack.shift();
+									self.fireWith( memory[ 0 ], memory[ 1 ] );
+								}
+							} else if ( memory === true ) {
+								self.disable();
+							} else {
+								list = [];
+							}
+						}
+					},
+		};
+		
 	//Deferred Object 异步队列
 	
 	//Support 浏览器功能测试

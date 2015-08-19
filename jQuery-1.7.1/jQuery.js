@@ -718,7 +718,7 @@
 		
 	})();
 	
-	//工具方法 utilities
+	//utilities 工具方法
 	
 	//Callbacks Object 回调函数列表
 	

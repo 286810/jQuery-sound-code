@@ -749,21 +749,22 @@
 			//先从缓存对象中获取标记字符串 flags 对应的标记对象，如果没找到，用工具函数将标记字符串解析为标记对象
 			flags = flags ? ( flagsCache[ flags ] || createFlags[ flags ] ) : {};
 			
-			var // Actual callback list
+			var // 回调函数列表
 					list = [],
 					// Stack of fire calls for repeatable lists
+					// 如果不是 once 模式，那么 stack 会保持住 fire 所需的上下文跟参数
 					stack = [],
-					// Last fire value for non-forgettable lists
+					// 是否为 memory 类型的
 					memory,
-					// Flag to know if list was already fired
+					// 是否已经触发过
 					fired,
-					// Flag to know if list is currently firing
+					// 是否正在触发
 					firing,
-					// First callback to fire
+					// 回调的起点
 					firingStart,
-					// End of the loop when firing
+					// 队列长度
 					firingLength,
-					//Index of currently firing callback
+					// 当前触发的回调函数在队列中的索引
 					firingIndex,
 					
 					add = function( args ) {
@@ -799,6 +800,7 @@
 						firing = true;
 						firingIndex = firingStart || 0;
 						firingStart = 0;
+						//因为 fire 的时候可能还在 add 回调，所以这里要维护一下队列长度
 						firingLength = list.length;
 						for ( ; list && firingIndex < firingLength; firingIndex++ ) {
 							//执行回调函数 list[ firingIndex ],如果返回值是 false，并且是 stopOnFalse 模式，则变量 memory 被赋值为 true，并停止执行后续的回调函数，表示当前回调函数列表已经被触发过
@@ -810,7 +812,15 @@
 						//执行后设置为 false，表示未执行
 						firing = false;
 						if ( list ) {
-							//如果不是 once 模式，则从 stack 中弹出存放的下文和参数，再次执行整个回调函数列表，直到 stack 为空
+							/*
+							 * 如果不是 once 模式，则从 stack 中弹出存放的下文和参数，再次执行整个回调函数列表，直到 stack 为空
+							 * 
+							 * 如果是 once 模式，并且不是 memory 模式，则禁用回调函数列表
+							 * 
+							 * 如果是 once + stopOnFalse 模式，并且某个回调函数返回了 false ，则禁用回调函数列表
+							 * 
+							 * 如果是 once + memory 模式，则清空数组 list，后续添加的回调函数还会立即执行
+							 */
 							if ( !flags.once ) {
 								if ( stack && stack.length ) {
 									memory = stack.shift();
@@ -823,6 +833,116 @@
 							}
 						}
 					},
+					self = {
+						add: function() {
+						  if ( list ) {
+								//在添加回调函数前，先备份数组 list 的长度，该值也是回调函数的插入位置
+								var length = list.length;
+								//调用工具函数添加回调函数
+								add( arguments );
+								//如果回调函数队列正在执行中，则修正结束下标 firingLength，使得新添加的回调函数也能执行
+								if ( firing ) {
+									firingLength = list.length;
+								//如果回调函数队列未在执行中，并且已经被触发过，则修正起始下标为回调函数的插入位置，然后立即执行	
+								} else if ( memory && memory !== true ) {
+									firingStart = length;
+									fire( memory[ 0 ], memory[ 1 ] );
+								}
+							}
+							//返回当前回调函数列表，以保持链式语法
+							return this;
+						},
+						remove: function() {
+							if ( list ) {
+								var args = arguments,
+										argIndex = 0,
+										argLength = args.length;
+								for ( ; argIndex < argLength; argIndex++ ) {
+									for ( var i = 0; i < list.length; i++ ){
+										if ( args[ argIndex ] === list[ i ] ) {
+											//如果回调函数列表正在执行，则在移除前使结束下标 firingLength 减 1；如果移除的函数的下标小于正在执行函数的下标，则修正 firingIndex 减 1，以确保不会漏执行函数
+											if( firing ) {
+												if ( i <= firingLength ) {
+													firingLength--;
+													if ( i <= firingIndex ) {
+														firingIndex--;
+													}
+												}
+											}
+											
+											list.splice( i--, 1 );
+											//在 unique 模式下，list 中不会有重复的回调函数，可以直接退出内层遍历
+											if ( flags.unique ) {
+												break;	
+											}
+										}
+									}
+								}
+							}							
+							//返回当前回调函数列表，以保持链式语法
+							return this;
+						},
+						has: function( fn ) {
+							if ( list ) {
+								var i = 0,
+										length = list.length;
+								for ( ; i < length; i++ ) {
+									if ( list[ i ] === fn ) {
+										return true;
+									}
+								}
+							}
+							return false;
+						},
+						empty: function() {
+							list = [];
+							return this;
+						},
+						//禁用回调函数列表，使它不再做任何事
+						disable: function() {
+							list = stack = memory = undefined;
+							return this;
+						},
+						disabled: function() {
+							return !list;
+						},
+						//锁定回调函数列表，使它无法再次触发
+						lock: function() {
+							stack = undefined;
+							if ( !memory || memory === true ) {
+								self.disable();
+							}
+							return this;
+						},
+						locked: function() {
+							return !stack;
+						},
+						
+						fireWith: function( context, args ) {
+							if ( stack ) {
+								//如果正在执行且不是 once 模式
+								if ( firing ) {
+									if ( !flags.once ) {
+										stack.push( [ context, args ] );
+									}
+								//如果没有执行，并且不是触发过的 once 模式	
+								} else if ( !( flags.once && memory ) ) {
+									fire( context, args );
+								}
+							}
+							
+							return this;
+						},
+						fire: function() {
+							self.fireWith( this, arguments );
+							return this;
+						},
+						fired: function() {
+							return !!memory;	
+						}
+					};
+			
+			return self;
 		};
 		
 	//Deferred Object 异步队列
